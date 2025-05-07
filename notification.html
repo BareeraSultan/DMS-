@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - GIKI Document Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #a8d0e6, #f8f9fa);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .notification-container {
+            width: 80%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #5a9bd4;
+            margin-bottom: 20px;
+        }
+
+        .notification-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #dcedf7;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-item h4 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #5a9bd4;
+        }
+
+        .notification-item p {
+            margin: 5px 0 0;
+            color: #666;
+        }
+
+        .notification-item .date {
+            font-size: 0.9rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="notification-container">
+        <h2>Notifications</h2>
+        <ul class="notification-list" id="notificationList">
+            <!-- Notifications will be dynamically loaded here -->
+        </ul>
+    </div>
+
+    <script>
+        async function fetchNotifications() {
+            try {
+                const response = await fetch("http://localhost:5000/api/notifications");
+                const notifications = await response.json();
+
+                const notificationList = document.getElementById("notificationList");
+                notificationList.innerHTML = ""; // Clear existing notifications
+
+                notifications.forEach(notification => {
+                    const listItem = document.createElement("li");
+                    listItem.className = "notification-item";
+
+                    listItem.innerHTML = `
+                        <div>
+                            <h4>${notification.title}</h4>
+                            <p>${notification.message}</p>
+                        </div>
+                        <div class="date">${notification.date}</div>
+                    `;
+
+                    notificationList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error("Error fetching notifications:", error);
+            }
+        }
+
+        // Fetch notifications when the page loads
+        fetchNotifications();
+    </script>
+</body>
+</html>
