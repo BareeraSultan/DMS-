@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,7 +86,11 @@
             margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+        }
+
+        .assignment-info {
+            flex: 1;
         }
 
         .assignment-card h4 {
@@ -101,6 +106,7 @@
 
         .assignment-meta {
             text-align: right;
+            margin-left: 20px;
         }
 
         .assignment-meta .deadline {
@@ -121,8 +127,188 @@
         .assignment-meta .status.completed {
             color: #4caf50;
         }
+
+        .assignment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .download-btn,
+        .view-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+
+        .view-btn {
+            background: #2196F3;
+        }
+
+        .download-btn:hover {
+            background: #45a049;
+        }
+
+        .view-btn:hover {
+            background: #1976D2;
+        }
+
+        .download-btn i,
+        .view-btn i {
+            font-size: 14px;
+        }
+
+        /* New styles for teacher features */
+        .create-assignment-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .create-assignment-btn:hover {
+            background: #45a049;
+        }
+
+        .assignment-form {
+            display: none;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .assignment-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .file-upload:hover {
+            border-color: #5a9bd4;
+        }
+
+        .file-upload i {
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .remove-file {
+            color: #dc3545;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #5a9bd4;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .teacher-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn,
+        .delete-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
     </style>
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Sidebar Navigation -->
@@ -164,34 +350,328 @@
         <!-- Main Content -->
         <div class="main-content">
             <h2>Assignments</h2>
+
+            <!-- Teacher-specific elements -->
+            <div id="teacherControls" style="display: none;">
+                <button class="create-assignment-btn" onclick="toggleAssignmentForm()">
+                    <i class="fas fa-plus"></i> Create New Assignment
+                </button>
+
+                <div id="assignmentForm" class="assignment-form">
+                    <form id="newAssignmentForm" onsubmit="createAssignment(event)">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="course">Course Name</label>
+                            <input type="text" id="course" name="course" required placeholder="Enter course name">
+                        </div>
+                        <div class="form-group">
+                            <label for="courseCode">Course Code</label>
+                            <input type="text" id="courseCode" name="course_code" required
+                                placeholder="Enter course code">
+                        </div>
+                        <div class="form-group">
+                            <label for="dueDate">Due Date</label>
+                            <input type="datetime-local" id="dueDate" name="due_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="totalPoints">Total Points</label>
+                            <input type="number" id="totalPoints" name="total_points" value="100" min="1" max="100"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label>Assignment Document</label>
+                            <div class="file-upload" onclick="document.getElementById('assignmentFile').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click to upload or drag and drop</p>
+                                <input type="file" id="assignmentFile" style="display: none"
+                                    onchange="handleFileSelect(event)">
+                            </div>
+                            <div id="selectedFileName" class="file-name"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary"
+                                onclick="toggleAssignmentForm()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Create Assignment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="assignments-list" id="assignmentsList">
                 <!-- Assignments will be dynamically loaded here -->
             </div>
         </div>
     </div>
+
     <script>
+        let currentUser = null;
+        let selectedFile = null;
+        let editingAssignmentId = null;
+
+        async function fetchUserRole() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch("http://localhost:5001/api/user/role", {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user role');
+                }
+
+                const userData = await response.json();
+                currentUser = userData;
+
+                // Show/hide teacher controls based on role
+                const teacherControls = document.getElementById('teacherControls');
+                if (userData.role === 'teacher' || userData.role === 'admin') {
+                    teacherControls.style.display = 'block';
+                    // Load courses for the dropdown
+                    fetchCourses();
+                }
+            } catch (error) {
+                console.error("Error fetching user role:", error);
+            }
+        }
+
+        async function fetchCourses() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch("http://localhost:5001/api/courses", {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch courses');
+                }
+
+                const courses = await response.json();
+                const courseSelect = document.getElementById('course');
+                courseSelect.innerHTML = courses.map(course =>
+                    `<option value="${course.course_id}">${course.name} (${course.code})</option>`
+                ).join('');
+            } catch (error) {
+                console.error("Error fetching courses:", error);
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                const fileNameDiv = document.getElementById('selectedFileName');
+                fileNameDiv.innerHTML = `
+                    ${file.name}
+                    <span class="remove-file" onclick="removeSelectedFile()">
+                        <i class="fas fa-times"></i>
+                    </span>
+                `;
+            }
+        }
+
+        function removeSelectedFile() {
+            selectedFile = null;
+            document.getElementById('assignmentFile').value = '';
+            document.getElementById('selectedFileName').innerHTML = '';
+        }
+
+        async function editAssignment(assignmentId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`http://localhost:5001/api/assignments/${assignmentId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch assignment details');
+                }
+
+                const assignment = await response.json();
+                editingAssignmentId = assignmentId;
+
+                // Populate form with assignment data
+                document.getElementById('title').value = assignment.title;
+                document.getElementById('description').value = assignment.description;
+                document.getElementById('course').value = assignment.course_name;
+                document.getElementById('courseCode').value = assignment.course_code;
+                document.getElementById('dueDate').value = new Date(assignment.due_date).toISOString().slice(0, 16);
+                document.getElementById('totalPoints').value = assignment.total_points;
+
+                // Show the form
+                const form = document.getElementById('assignmentForm');
+                form.classList.add('active');
+
+                // Change submit button text
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.textContent = 'Update Assignment';
+            } catch (error) {
+                console.error("Error fetching assignment details:", error);
+                alert('Failed to load assignment details. Please try again.');
+            }
+        }
+
+        async function createAssignment(event) {
+            event.preventDefault();
+
+            try {
+                const formData = new FormData();
+                formData.append('title', document.getElementById('title').value);
+                formData.append('description', document.getElementById('description').value);
+                formData.append('course_name', document.getElementById('course').value);
+                formData.append('course_code', document.getElementById('courseCode').value);
+                formData.append('due_date', document.getElementById('dueDate').value);
+                formData.append('total_points', document.getElementById('totalPoints').value);
+
+                if (selectedFile) {
+                    formData.append('file', selectedFile);
+                }
+
+                const token = localStorage.getItem('token');
+                const url = editingAssignmentId
+                    ? `http://localhost:5001/api/assignments/${editingAssignmentId}`
+                    : "http://localhost:5001/api/assignments";
+
+                console.log('Sending assignment data:', {
+                    title: formData.get('title'),
+                    course_name: formData.get('course_name'),
+                    course_code: formData.get('course_code'),
+                    due_date: formData.get('due_date'),
+                    hasFile: !!selectedFile
+                });
+
+                const response = await fetch(url, {
+                    method: editingAssignmentId ? 'PUT' : 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to save assignment');
+                }
+
+                // Reset form and state
+                document.getElementById('newAssignmentForm').reset();
+                removeSelectedFile();
+                toggleAssignmentForm();
+                editingAssignmentId = null;
+
+                // Refresh assignments list
+                fetchAssignments();
+
+                alert(editingAssignmentId ? 'Assignment updated successfully!' : 'Assignment created successfully!');
+            } catch (error) {
+                console.error("Error saving assignment:", error);
+                alert(error.message || 'Failed to save assignment. Please try again.');
+            }
+        }
+
+        function toggleAssignmentForm() {
+            const form = document.getElementById('assignmentForm');
+            form.classList.toggle('active');
+
+            // Reset form and state when closing
+            if (!form.classList.contains('active')) {
+                document.getElementById('newAssignmentForm').reset();
+                removeSelectedFile();
+                editingAssignmentId = null;
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.textContent = 'Create Assignment';
+            }
+        }
+
         async function fetchAssignments() {
             try {
-                const response = await fetch("http://localhost:5000/api/assignments");
-                const assignments = await response.json();
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
 
+                const response = await fetch("http://localhost:5001/api/assignments", {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch assignments');
+                }
+
+                const assignments = await response.json();
                 const assignmentsList = document.getElementById("assignmentsList");
                 assignmentsList.innerHTML = ""; // Clear existing assignments
+
+                if (assignments.length === 0) {
+                    assignmentsList.innerHTML = `
+                        <div class="assignment-card">
+                            <p>No assignments available.</p>
+                        </div>
+                    `;
+                    return;
+                }
 
                 assignments.forEach(assignment => {
                     const assignmentCard = document.createElement("div");
                     assignmentCard.className = "assignment-card";
 
+                    const teacherActions = (currentUser.role === 'teacher' || currentUser.role === 'admin') ? `
+                        <div class="teacher-actions">
+                            <button class="edit-btn" onclick="editAssignment(${assignment.assignment_id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="delete-btn" onclick="deleteAssignment(${assignment.assignment_id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    ` : '';
+
+                    const fileActions = assignment.file_path ? `
+                        <div class="assignment-actions">
+                            <button class="download-btn" onclick="downloadAssignment(${assignment.assignment_id})">
+                                <i class="fas fa-download"></i> Download Attachment
+                            </button>
+                            <a href="${assignment.file_path}" target="_blank" class="view-btn">
+                                <i class="fas fa-eye"></i> View Attachment
+                            </a>
+                        </div>
+                    ` : '';
+
                     assignmentCard.innerHTML = `
-                        <div>
+                        <div class="assignment-info">
                             <h4>${assignment.title}</h4>
-                            <p>${assignment.course}</p>
+                            <p>${assignment.course_name} (${assignment.course_code})</p>
+                            <p>${assignment.description || ''}</p>
+                            ${fileActions}
                         </div>
                         <div class="assignment-meta">
                             <div class="deadline">
                                 <i class="fas fa-calendar"></i> Due: ${new Date(assignment.due_date).toLocaleDateString()}
                             </div>
-                            <div class="status ${assignment.status.toLowerCase()}">${assignment.status}</div>
+                            <div class="points">
+                                <i class="fas fa-star"></i> Points: ${assignment.total_points}
+                            </div>
+                            ${teacherActions}
                         </div>
                     `;
 
@@ -199,15 +679,93 @@
                 });
             } catch (error) {
                 console.error("Error fetching assignments:", error);
+                const assignmentsList = document.getElementById("assignmentsList");
+                assignmentsList.innerHTML = `
+                    <div class="assignment-card">
+                        <p>Error loading assignments. Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function deleteAssignment(assignmentId) {
+            if (!confirm('Are you sure you want to delete this assignment?')) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`http://localhost:5001/api/assignments/${assignmentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete assignment');
+                }
+
+                // Refresh assignments list
+                fetchAssignments();
+                alert('Assignment deleted successfully!');
+            } catch (error) {
+                console.error("Error deleting assignment:", error);
+                alert('Failed to delete assignment. Please try again.');
+            }
+        }
+
+        async function downloadAssignment(assignmentId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`http://localhost:5001/api/assignments/${assignmentId}/download`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to download file');
+                }
+
+                // Get the filename from the Content-Disposition header
+                const contentDisposition = response.headers.get('Content-Disposition');
+                const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/);
+                const filename = filenameMatch ? filenameMatch[1] : 'assignment-file';
+
+                // Create a blob from the response
+                const blob = await response.blob();
+
+                // Create a download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+
+                // Clean up
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error("Error downloading assignment:", error);
+                alert(error.message || 'Failed to download file. Please try again.');
             }
         }
 
         function logout() {
-            alert("Logout functionality not implemented yet.");
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
         }
 
-        // Fetch assignments when the page loads
-        fetchAssignments();
+        // Check authentication and fetch assignments when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchUserRole();
+            fetchAssignments();
+        });
     </script>
 </body>
+
 </html>

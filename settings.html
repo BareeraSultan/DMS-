@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -131,6 +132,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="dashboard-container">
         <div class="sidebar">
@@ -199,7 +201,7 @@
             const password = document.getElementById("password").value;
 
             try {
-                const response = await fetch("http://localhost:5000/api/settings", {
+                const response = await fetch("http://localhost:5001/api/settings", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -223,8 +225,14 @@
         }
 
         function logout() {
-            alert("Logout functionality not implemented yet.");
+            // Clear the authentication token
+            localStorage.removeItem('token');
+            // Clear any other stored data
+            localStorage.removeItem('user');
+            // Redirect to the index page
+            window.location.href = 'index.html';
         }
     </script>
 </body>
+
 </html>

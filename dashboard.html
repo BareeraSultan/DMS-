@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -137,7 +138,8 @@
             border-collapse: collapse;
         }
 
-        .file-details th, .file-details td {
+        .file-details th,
+        .file-details td {
             border: 1px solid #ccc;
             padding: 10px;
             text-align: left;
@@ -152,7 +154,8 @@
             background: #f8f9fa;
         }
 
-        .privacy-select, .format-select {
+        .privacy-select,
+        .format-select {
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -180,6 +183,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Sidebar Navigation -->
@@ -212,7 +216,7 @@
                         <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
                     </li>
                     <li>
-                        <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </li>
                 </ul>
             </div>
@@ -224,5 +228,17 @@
             <p>Here you can manage your documents, assignments, and more.</p>
         </div>
     </div>
+
+    <script>
+        function logout() {
+            // Clear the authentication token
+            localStorage.removeItem('token');
+            // Clear any other stored data
+            localStorage.removeItem('user');
+            // Redirect to the index page
+            window.location.href = 'index.html';
+        }
+    </script>
 </body>
+
 </html>

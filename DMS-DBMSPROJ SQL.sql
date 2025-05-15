@@ -2,8 +2,8 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Create enum types
-CREATE TYPE user_role AS ENUM('admin', 'regular');
-CREATE TYPE document_type AS ENUM('pdf', 'docx', 'txt', 'other');
+CREATE TYPE user_role AS ENUM('admin', 'student', 'teacher');
+CREATE TYPE document_type AS ENUM('pdf', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'other');
 CREATE TYPE notification_type AS ENUM('shared', 'comment', 'system');
 
 -- Users table (authentication)
@@ -12,10 +12,34 @@ CREATE TABLE users (
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    role user_role NOT NULL DEFAULT 'regular',
+    role user_role NOT NULL DEFAULT 'student',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP WITH TIME ZONE
+);
+
+-- Courses table
+CREATE TABLE courses (
+    course_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Assignments table
+CREATE TABLE assignments (
+    assignment_id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    course_id INTEGER REFERENCES courses(course_id) ON DELETE CASCADE,
+    created_by INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+    due_date TIMESTAMP WITH TIME ZONE,
+    total_points INTEGER DEFAULT 100,
+    file_path TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Documents table
@@ -26,8 +50,7 @@ CREATE TABLE documents (
     file_path TEXT NOT NULL,
     file_type document_type NOT NULL,
     file_size INTEGER NOT NULL,
-	owner_id INTEGER,
-    foreign key(owner_id)  REFERENCES users(user_id) ON DELETE CASCADE,
+    owner_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
     upload_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     is_private BOOLEAN DEFAULT TRUE,
@@ -37,12 +60,9 @@ CREATE TABLE documents (
 -- Shared documents
 CREATE TABLE shared_documents (
     share_id SERIAL PRIMARY KEY,
-	document_id INTEGER,
-	shared_by INTEGER,
-	shared_with INTEGER,
-    foreign key(document_id) REFERENCES documents(document_id) ON DELETE CASCADE,
-    foreign key (shared_by) REFERENCES users(user_id) ON DELETE CASCADE,
-    foreign key(shared_with) REFERENCES users(user_id) ON DELETE CASCADE,
+    document_id INTEGER REFERENCES documents(document_id) ON DELETE CASCADE,
+    shared_by INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+    shared_with INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
     can_edit BOOLEAN DEFAULT FALSE,
     shared_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(document_id, shared_with)
@@ -51,22 +71,18 @@ CREATE TABLE shared_documents (
 -- Document versions
 CREATE TABLE document_versions (
     version_id SERIAL PRIMARY KEY,
-	 document_id INTEGER,
-     foreign key(document_id) REFERENCES documents(document_id) ON DELETE CASCADE,
+    document_id INTEGER REFERENCES documents(document_id) ON DELETE CASCADE,
     file_path TEXT NOT NULL,
     version_number INTEGER NOT NULL,
     uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-	uploaded_by INTEGER,
-    foreign key(uploaded_by) REFERENCES users(user_id) on delete cascade
+    uploaded_by INTEGER REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 -- Comments
 CREATE TABLE document_comments (
     comment_id SERIAL PRIMARY KEY,
-	document_id INTEGER,
-	user_id INTEGER,
-    foreign key(document_id) REFERENCES documents(document_id) ON DELETE CASCADE,
-    foreign key(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    document_id INTEGER REFERENCES documents(document_id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
     comment_text TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -75,26 +91,13 @@ CREATE TABLE document_comments (
 -- Notifications
 CREATE TABLE notifications (
     notification_id SERIAL PRIMARY KEY,
-	user_id INTEGER,
-    foreign key(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
     type notification_type NOT NULL,
     title VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
-    related_entity_id UUID,
+    related_entity_id INTEGER,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- Assignments
-CREATE TABLE assignments (
-    assignment_id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-	created_by INTEGER,
-    foreign key(created_by) REFERENCES users(user_id) ON DELETE CASCADE,
-    due_date TIMESTAMP WITH TIME ZONE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create indexes
@@ -117,6 +120,7 @@ CREATE INDEX idx_notifications_is_read ON notifications(is_read) WHERE is_read =
 
 CREATE INDEX idx_assignments_created_by ON assignments(created_by);
 CREATE INDEX idx_assignments_due_date ON assignments(due_date);
+CREATE INDEX idx_assignments_course ON assignments(course_id);
 
 -- Create views
 CREATE OR REPLACE VIEW user_documents_view AS
@@ -192,7 +196,6 @@ CREATE OR REPLACE FUNCTION check_file_size()
 RETURNS TRIGGER AS $$
 BEGIN
   IF NEW.file_size > 5242880 THEN  -- 5MB limit for the file that was uplaoded
-
     RAISE EXCEPTION 'File size exceeds 5MB limit';
   END IF;
   RETURN NEW;

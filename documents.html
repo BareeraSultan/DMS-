@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -144,9 +145,65 @@
         .document-card a:hover {
             text-decoration: underline;
         }
+
+        /* Add these styles to your existing CSS */
+        .document-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            background: #5a9bd4;
+            color: white !important;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .action-button:hover {
+            background: #4a8ac4;
+            text-decoration: none;
+            color: white !important;
+        }
+
+        .action-button i {
+            font-size: 0.9em;
+            color: white;
+        }
     </style>
 </head>
+
 <body>
+    <!-- Add Share Modal -->
+    <div id="shareModal" class="modal"
+        style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content"
+            style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 10px;">
+            <span class="close"
+                style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h2>Share Document</h2>
+            <div style="margin: 20px 0;">
+                <label for="shareEmail">Share with (email):</label>
+                <input type="email" id="shareEmail"
+                    style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+                <div style="margin: 10px 0;">
+                    <input type="checkbox" id="canEdit">
+                    <label for="canEdit">Allow editing</label>
+                </div>
+                <button onclick="shareDocument()" class="action-button" style="width: 100%;">Share</button>
+            </div>
+        </div>
+    </div>
+
     <div class="dashboard-container">
         <!-- Sidebar Navigation -->
         <div class="sidebar">
@@ -201,34 +258,168 @@
     </div>
 
     <script>
-        async function fetchDocuments() {
-            try {
-                const response = await fetch("http://localhost:5000/api/documents");
-                const documents = await response.json();
+        let currentDocumentId = null;
 
-                const documentsContainer = document.getElementById("documentsContainer");
-                documentsContainer.innerHTML = ""; // Clear existing documents
+        function showShareModal(documentId) {
+            currentDocumentId = documentId;
+            document.getElementById('shareModal').style.display = 'block';
+            document.getElementById('shareEmail').value = '';
+            document.getElementById('canEdit').checked = false;
+        }
 
-                documents.forEach(doc => {
-                    const card = document.createElement("div");
-                    card.className = "document-card";
+        // Close modal when clicking the X or outside the modal
+        document.querySelector('.close').onclick = function () {
+            document.getElementById('shareModal').style.display = 'none';
+        }
 
-                    card.innerHTML = `
-                        <h3>${doc.name}</h3>
-                        <p>Size: ${doc.size} MB</p>
-                        <p>Uploaded: ${new Date(doc.uploaded_at).toLocaleDateString()}</p>
-                        <a href="${doc.url}" target="_blank">View Document</a>
-                    `;
-
-                    documentsContainer.appendChild(card);
-                });
-            } catch (error) {
-                console.error("Error fetching documents:", error);
+        window.onclick = function (event) {
+            const modal = document.getElementById('shareModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
             }
         }
 
-        // Fetch documents when the page loads
-        fetchDocuments();
+        async function shareDocument() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const shareEmail = document.getElementById('shareEmail').value;
+                const canEdit = document.getElementById('canEdit').checked;
+
+                if (!shareEmail) {
+                    alert('Please enter an email address');
+                    return;
+                }
+
+                const response = await fetch('http://localhost:5001/api/documents/share', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        document_id: currentDocumentId,
+                        shared_with: shareEmail,
+                        can_edit: canEdit
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to share document');
+                }
+
+                alert('Document shared successfully!');
+                document.getElementById('shareModal').style.display = 'none';
+            } catch (error) {
+                console.error('Error sharing document:', error);
+                alert('Failed to share document. Please try again.');
+            }
+        }
+
+        async function fetchDocuments() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch("http://localhost:5001/api/documents", {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch documents');
+                }
+
+                const documents = await response.json();
+                const container = document.getElementById('documentsContainer');
+                container.innerHTML = '';
+
+                documents.forEach(doc => {
+                    const card = document.createElement('div');
+                    card.className = 'document-card';
+                    card.innerHTML = `
+                        <h3>${doc.title}</h3>
+                        <p>Type: ${doc.file_type.toUpperCase()}</p>
+                        <p>Size: ${formatFileSize(doc.file_size)}</p>
+                        <p>Uploaded: ${new Date(doc.upload_date).toLocaleDateString()}</p>
+                        <div class="document-actions">
+                            <button onclick="viewDocument('${doc.file_path}')" class="action-button">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <a href="${doc.file_path}" class="action-button" download>
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                            <button onclick="showShareModal(${doc.document_id})" class="action-button">
+                                <i class="fas fa-share-alt"></i> Share
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function viewDocument(filePath) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // The filePath is already a full URL, no need to add the base URL
+                console.log('Attempting to view file:', filePath);
+
+                // For PDFs and images, we can open directly
+                const fileType = filePath.split('.').pop().toLowerCase();
+                console.log('File type:', fileType);
+
+                if (['pdf', 'jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+                    // Add authorization header to the request
+                    const response = await fetch(filePath, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch file');
+                    }
+
+                    // Create a blob URL and open it
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                } else {
+                    alert('This file type cannot be viewed directly. Please use the download button.');
+                }
+            } catch (error) {
+                console.error('Error viewing document:', error);
+                alert('Error viewing document. Please try downloading instead.');
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Load documents when page loads
+        document.addEventListener('DOMContentLoaded', fetchDocuments);
     </script>
 </body>
+
 </html>

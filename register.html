@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,7 +40,8 @@
             font-weight: bold;
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ccc;
@@ -74,6 +76,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="signup-container">
         <h2>Sign Up</h2>
@@ -95,7 +98,8 @@
 
             <div class="form-group">
                 <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password"
+                    required>
             </div>
 
             <div class="form-group">
@@ -130,20 +134,25 @@
             }
 
             try {
-                const response = await fetch("http://localhost:5000/api/register", {
+                const response = await fetch("http://localhost:5001/api/register", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ name, email, password, userType }),
+                    body: JSON.stringify({
+                        full_name: name,
+                        email: email,
+                        password: password,
+                        userType: userType
+                    }),
                 });
 
                 const data = await response.json();
                 if (response.ok) {
                     alert("Registration successful! Redirecting to login...");
-                    window.location.href = "login.html"; // Redirect to login page
+                    window.location.href = "login.html";
                 } else {
-                    alert(data.message || "Registration failed!");
+                    alert(data.error || data.message || "Registration failed!");
                 }
             } catch (error) {
                 console.error("Error:", error);
@@ -152,4 +161,5 @@
         });
     </script>
 </body>
+
 </html>

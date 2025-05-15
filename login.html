@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -170,6 +171,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-sidebar">
@@ -183,13 +185,13 @@
             </div>
             <h2>Login</h2>
             <p>Login to your Account</p>
-            
+
             <form id="loginForm" onsubmit="return login(event)">
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" placeholder="Enter your email" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-input">
@@ -199,13 +201,13 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="forgot-password">
                     <a href="#"><i class="fas fa-lock"></i> Forgot Password</a>
                 </div>
-                
+
                 <button type="submit" class="primary-button login-button">SIGN IN</button>
-                
+
                 <div class="register-link">
                     Don't have an Account? <a href="register.html">Create Account</a>
                 </div>
@@ -227,14 +229,16 @@
             }
         }
 
-        async function login(event) {
-            event.preventDefault();
-
+        async function login(e) {
+            e.preventDefault();
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
 
+            console.log('Login form submission:', { email, password });
+
             try {
-                const response = await fetch("http://localhost:5000/api/login", {
+                console.log('Attempting login with:', { email, password });
+                const response = await fetch("http://localhost:5001/api/login", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -243,18 +247,22 @@
                 });
 
                 const data = await response.json();
+                console.log('Login response:', data);
+
                 if (response.ok) {
-                    alert("Login successful!");
-                    // Redirect to dashboard or home page
+                    // Store the token
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
                     window.location.href = "dashboard.html";
                 } else {
-                    alert(data.message || "Login failed!");
+                    alert(data.error || "Login failed!");
                 }
             } catch (error) {
-                console.error("Error:", error);
-                alert("An error occurred. Please try again.");
+                console.error("Login error:", error);
+                alert("An error occurred during login. Please try again.");
             }
         }
     </script>
 </body>
+
 </html>

@@ -1,0 +1,150 @@
+/* Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #3559E0;
+    --primary-dark: #2A48B8;
+    --primary-light: #4A6DE5;
+    --accent-color: #6a11cb;
+    --secondary-color: #7c3aed;
+    --text-dark: #333333;
+    --text-light: #666666;
+    --bg-light: #f8f9fa;
+    --bg-white: #ffffff;
+    --danger: #dc3545;
+    --success: #28a745;
+    --warning: #ffc107;
+    --border-color: #e6e6e6;
+    --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+button {
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Button Styles */
+.primary-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.primary-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.secondary-button {
+    background: var(--bg-white);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.secondary-button:hover {
+    background: var(--bg-light);
+}
+
+/* Landing Page Styles */
+.landing-container {
+    display: flex;
+    height: 100vh;
+    background: linear-gradient(135deg, #4a6de5 0%, #2a48b8 100%);
+    color: white;
+    padding: 0 5%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.landing-content {
+    max-width: 500px;
+}
+
+.landing-content h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.landing-content p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    font-weight: 300;
+}
+
+.landing-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Login Page Styles */
+.login-container {
+    display: flex;
+    height: 100vh;
+}
+
+.login-sidebar {
+    width: 30%;
+    background: linear-gradient(135deg, #4a6de5 0%, #2a48b8 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.circle-top {
+    width: 300px;
+    height: 300px;
+    top: -150px;
+    left: -100px;
+}
+
+.circle-middle {
+    width: 200px;
+    height: 200px;
+    top: 30%;
+    left: 50%;
+}
+

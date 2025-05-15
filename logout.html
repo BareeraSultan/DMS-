@@ -64,7 +64,7 @@
         async function redirectToLogin() {
             try {
                 // Call the backend to handle logout
-                const response = await fetch("http://localhost:5000/api/logout", {
+                const response = await fetch("http://localhost:5001/api/logout", {
                     method: "POST",
                     credentials: "include", // Include cookies for session-based logout
                 });

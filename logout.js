@@ -3,10 +3,10 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
 const app = express();
-const PORT = 5000;
+const PORT = 5001;
 
 // Middleware
-app.use(cors({ origin: "http://localhost:5000", credentials: true }));
+app.use(cors({ origin: "http://localhost:5001", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 

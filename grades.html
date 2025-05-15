@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grades - GIKI Document Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #a8d0e6, #f8f9fa);
+            color: #333;
+            display: flex;
+            height: 100vh;
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: #5a9bd4;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar-menu a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu a:hover {
+            color: #dcedf7;
+        }
+
+        .sidebar-divider {
+            border-top: 1px solid #dcedf7;
+            margin: 15px 0;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            margin: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .search-bar button {
+            background: #5a9bd4;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background: #4a8ac4;
+        }
+
+        /* Grades Table Styles */
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .grades-table th,
+        .grades-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .grades-table th {
+            background: #5a9bd4;
+            color: white;
+            font-weight: 500;
+        }
+
+        .grades-table tr:hover {
+            background: #f5f9fc;
+        }
+
+        .grade-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .grade-pass {
+            background: #e3fcef;
+            color: #00a854;
+        }
+
+        .grade-fail {
+            background: #fff1f0;
+            color: #f5222d;
+        }
+
+        .grade-pending {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            background: #5a9bd4;
+            color: white !important;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .action-button:hover {
+            background: #4a8ac4;
+            text-decoration: none;
+            color: white !important;
+        }
+
+        .action-button i {
+            font-size: 0.9em;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>GIKI DMS</h3>
+            </div>
+            <div class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="Upload Documents.html"><i class="fas fa-upload"></i> Upload Documents</a>
+                    </li>
+                    <li>
+                        <a href="documents.html"><i class="fas fa-file-alt"></i> My Documents</a>
+                    </li>
+                    <li>
+                        <a href="shared.html"><i class="fas fa-share-alt"></i> Shared with Me</a>
+                    </li>
+                    <li>
+                        <a href="assignments.html"><i class="fas fa-tasks"></i> Assignments</a>
+                    </li>
+                    <li>
+                        <a href="grades.html" class="active"><i class="fas fa-graduation-cap"></i> Grades</a>
+                    </li>
+                    <li>
+                        <a href="notification.html"><i class="fas fa-bell"></i> Notifications</a>
+                    </li>
+                    <li class="sidebar-divider"></li>
+                    <li>
+                        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="topbar">
+                <h2>Grades</h2>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search grades...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+
+            <table class="grades-table">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Assignment</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th>Submission Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="gradesTableBody">
+                    <!-- Grades will be dynamically loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function fetchGrades() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch("http://localhost:5001/api/grades", {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch grades');
+                }
+
+                const grades = await response.json();
+                const tableBody = document.getElementById("gradesTableBody");
+                tableBody.innerHTML = ""; // Clear existing grades
+
+                if (grades.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 20px;">
+                                No grades available yet.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                grades.forEach(grade => {
+                    const row = document.createElement("tr");
+
+                    // Determine status class and text
+                    let statusClass = 'grade-pending';
+                    let statusText = 'Pending';
+
+                    if (grade.grade !== null) {
+                        statusClass = grade.grade >= 60 ? 'grade-pass' : 'grade-fail';
+                        statusText = grade.grade >= 60 ? 'Pass' : 'Fail';
+                    }
+
+                    row.innerHTML = `
+                        <td>${grade.course_name}</td>
+                        <td>${grade.assignment_name}</td>
+                        <td>${grade.grade !== null ? grade.grade + '%' : 'Not Graded'}</td>
+                        <td><span class="grade-status ${statusClass}">${statusText}</span></td>
+                        <td>${new Date(grade.submission_date).toLocaleDateString()}</td>
+                        <td>
+                            <button onclick="viewSubmission(${grade.submission_id})" class="action-button">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error fetching grades:", error);
+                const tableBody = document.getElementById("gradesTableBody");
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 20px; color: #f5222d;">
+                            Error loading grades. Please try again later.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        async function viewSubmission(submissionId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:5001/api/submissions/${submissionId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch submission');
+                }
+
+                const submission = await response.json();
+                // Open the submission in a new tab
+                window.open(submission.file_url, '_blank');
+            } catch (error) {
+                console.error('Error viewing submission:', error);
+                alert('Error viewing submission. Please try again later.');
+            }
+        }
+
+        // Fetch grades when the page loads
+        document.addEventListener('DOMContentLoaded', fetchGrades);
+    </script>
+</body>
+
+</html>

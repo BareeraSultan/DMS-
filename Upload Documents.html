@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -137,7 +138,8 @@
             border-collapse: collapse;
         }
 
-        .file-details th, .file-details td {
+        .file-details th,
+        .file-details td {
             border: 1px solid #ccc;
             padding: 10px;
             text-align: left;
@@ -180,6 +182,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Sidebar Navigation -->
@@ -230,7 +233,8 @@
                         <h3>Drag & Drop files here</h3>
                         <p>or</p>
                         <label for="fileInput" class="browse-button">Browse Files</label>
-                        <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileSelect(event)">
+                        <input type="file" id="fileInput" multiple style="display: none;"
+                            onchange="handleFileSelect(event)">
                     </div>
                 </div>
             </div>
@@ -252,7 +256,7 @@
             selectedFiles = Array.from(event.target.files);
             const fileDetails = document.getElementById("fileDetails");
 
-            fileDetails.innerHTML = 
+            fileDetails.innerHTML = `
                 <table>
                     <thead>
                         <tr>
@@ -262,7 +266,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${selectedFiles.map(file => 
+                        ${selectedFiles.map(file => `
                             <tr>
                                 <td>${file.name}</td>
                                 <td>${(file.size / (1024 * 1024)).toFixed(2)}</td>
@@ -273,15 +277,22 @@
                                     </select>
                                 </td>
                             </tr>
-                        ).join("")}
+                        `).join("")}
                     </tbody>
                 </table>
-            ;
+            `;
         }
 
         async function uploadFiles() {
             if (selectedFiles.length === 0) {
                 alert("No files selected!");
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert("Please log in to upload files");
+                window.location.href = "login.html";
                 return;
             }
 
@@ -293,23 +304,50 @@
             });
 
             try {
-                const response = await fetch("http://localhost:5000/api/upload", {
+                const response = await fetch("http://localhost:5001/api/upload/batch", {
                     method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    },
                     body: formData,
                 });
+
+                const data = await response.json();
 
                 if (response.ok) {
                     alert("Files uploaded successfully!");
                     selectedFiles = [];
                     document.getElementById("fileDetails").innerHTML = "";
                 } else {
-                    alert("Failed to upload files.");
+                    alert(data.error || "Failed to upload files.");
                 }
             } catch (error) {
                 console.error("Error uploading files:", error);
                 alert("An error occurred while uploading files.");
             }
         }
+
+        // Add drag and drop functionality
+        const dropZone = document.getElementById('dropZone');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '#e6f0fa';
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '#dcedf7';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '#dcedf7';
+            const files = Array.from(e.dataTransfer.files);
+            selectedFiles = files;
+            handleFileSelect({ target: { files: e.dataTransfer.files } });
+        });
     </script>
 </body>
+
 </html>
